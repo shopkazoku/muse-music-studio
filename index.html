@@ -6,9 +6,11 @@
     <title>MUSE MUSIC STUDIO - Suno AI Prompt Engine & Google Veo Cinematic Suite</title>
     <!-- SEO Meta Tags -->
     <meta name="description" content="Công cụ hỗ trợ sáng tác nhạc Suno AI và tạo prompt video Google Veo chuyên nghiệp. Biến cảm xúc thành âm nhạc, quản lý bản nhạc và xuất Lead Sheet chuẩn 0đ.">
-    <meta name="keywords" content="suno ai, google veo, soạn nhạc ai, prompt suno, muse music studio">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ABCjs CDN để render nốt nhạc chuẩn cho nhạc công -->
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.2/dist/abcjs-basic-min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.2.2/dist/abcjs-audio.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -38,12 +40,17 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0B0F19; }
         ::-webkit-scrollbar-thumb { background: #1F293D; border-radius: 3px; }
+        @media print {
+            body { background: white !important; color: black !important; }
+            header, footer, .no-print { display: none !important; }
+            .print-sheet { background: white !important; color: black !important; border: none !important; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
 
     <!-- HEADER -->
-    <header class="suno-header shadow-xl border-b border-orange-500/30 sticky top-0 z-50">
+    <header class="suno-header shadow-xl border-b border-orange-500/30 sticky top-0 z-50 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('trang-chu')">
                 <div class="bg-white/15 p-2.5 rounded-xl backdrop-blur-md border border-white/20 shadow-inner flex items-center justify-center">
@@ -98,16 +105,13 @@
                         </button>
                     </div>
                 </div>
-                <!-- Hiển thị chính xác hình ảnh đĩa vinyl thiết kế gốc của Boss -->
+                <!-- Vinyl Art -->
                 <div class="mt-8 lg:mt-0 relative z-10 flex justify-center">
                     <div class="w-72 h-72 sm:w-88 sm:h-88 rounded-full p-2 bg-gradient-to-tr from-purple-600/40 via-orange-500/30 to-pink-500/40 backdrop-blur-xl border border-white/10 shadow-2xl flex items-center justify-center animate-spin" style="animation-duration: 25s;">
                         <div class="w-full h-full rounded-full bg-slate-950 border-4 border-slate-800 flex items-center justify-center shadow-inner relative overflow-hidden">
-                            <!-- Các rãnh đĩa vinyl mô phỏng chân thực -->
                             <div class="absolute inset-4 rounded-full border border-slate-800"></div>
                             <div class="absolute inset-8 rounded-full border border-slate-800"></div>
                             <div class="absolute inset-12 rounded-full border border-slate-800"></div>
-                            <div class="absolute inset-16 rounded-full border border-slate-800"></div>
-                            <!-- Nhãn đĩa trung tâm màu cam hồng cam chuẩn gốc -->
                             <div class="w-28 h-28 rounded-full bg-gradient-to-br from-orange-500 via-rose-500 to-purple-600 border-4 border-slate-900 flex items-center justify-center shadow-lg">
                                 <div class="w-6 h-6 rounded-full bg-slate-950 border border-white/20"></div>
                             </div>
@@ -116,54 +120,29 @@
                 </div>
             </div>
 
-            <!-- Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div onclick="switchTab('soan-nhac')" class="group cursor-pointer bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-orange-500/50 rounded-3xl p-6 transition-all shadow-xl flex flex-col justify-between">
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-lg border border-orange-500/20">🎵</div>
-                            <span class="text-xs font-mono text-slate-500">01 / CREATE</span>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-orange-400 transition-colors">Soạn nhạc</h3>
-                            <p class="text-xs text-slate-400 mt-2 leading-relaxed">Chọn cảm xúc, chất nhạc và giọng hát. Định hình prompt mang dấu ấn của bạn.</p>
-                        </div>
+                        <div class="flex items-center justify-between"><div class="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-lg border border-orange-500/20">🎵</div><span class="text-xs font-mono text-slate-500">01 / CREATE</span></div>
+                        <div><h3 class="text-xl font-bold text-white group-hover:text-orange-400 transition-colors">Soạn nhạc</h3><p class="text-xs text-slate-400 mt-2 leading-relaxed">Chọn cảm xúc, chất nhạc và giọng hát. Định hình prompt mang dấu ấn của bạn.</p></div>
                     </div>
-                    <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-orange-400">
-                        <span>Viết nên giai điệu của bạn</span><span>→</span>
-                    </div>
+                    <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-orange-400"><span>Viết nên giai điệu của bạn</span><span>→</span></div>
                 </div>
 
                 <div onclick="switchTab('video-music')" class="group cursor-pointer bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-3xl p-6 transition-all shadow-xl flex flex-col justify-between">
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-lg border border-cyan-500/20">🎬</div>
-                            <span class="text-xs font-mono text-slate-500">02 / VISUALIZE</span>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Video Music</h3>
-                            <p class="text-xs text-slate-400 mt-2 leading-relaxed">Kể câu chuyện âm nhạc bằng hình ảnh. Tạo prompt video theo từng phân cảnh Google Veo.</p>
-                        </div>
+                        <div class="flex items-center justify-between"><div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-lg border border-cyan-500/20">🎬</div><span class="text-xs font-mono text-slate-500">02 / VISUALIZE</span></div>
+                        <div><h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Video Music</h3><p class="text-xs text-slate-400 mt-2 leading-relaxed">Kể câu chuyện âm nhạc bằng hình ảnh. Tạo prompt video theo từng phân cảnh Google Veo.</p></div>
                     </div>
-                    <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-cyan-400">
-                        <span>Cho âm nhạc một khung hình</span><span>→</span>
-                    </div>
+                    <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-cyan-400"><span>Cho âm nhạc một khung hình</span><span>→</span></div>
                 </div>
 
                 <div onclick="switchTab('ban-nhac')" class="group cursor-pointer bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-purple-500/50 rounded-3xl p-6 transition-all shadow-xl flex flex-col justify-between">
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg border border-purple-500/20">🎼</div>
-                            <span class="text-xs font-mono text-slate-500">03 / COLLECT</span>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">Bản nhạc</h3>
-                            <p class="text-xs text-slate-400 mt-2 leading-relaxed">Gom file nhạc, prompt và lời bài hát. Tải về trọn bộ câu chuyện sáng tác.</p>
-                        </div>
+                        <div class="flex items-center justify-between"><div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg border border-purple-500/20">🎼</div><span class="text-xs font-mono text-slate-500">03 / COLLECT</span></div>
+                        <div><h3 class="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">Bản nhạc</h3><p class="text-xs text-slate-400 mt-2 leading-relaxed">Gom file nhạc, prompt và lời bài hát. Tải về trọn bộ câu chuyện sáng tác.</p></div>
                     </div>
-                    <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-purple-400">
-                        <span>Lưu giữ bản nhạc của riêng bạn</span><span>→</span>
-                    </div>
+                    <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-purple-400"><span>Lưu giữ bản nhạc của riêng bạn</span><span>→</span></div>
                 </div>
             </div>
         </section>
@@ -202,11 +181,6 @@
                             <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Nhạc cụ đề xuất</label><input type="text" id="m1-instruments" value="Piano, guitar mộc, violin..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200"></div>
                             <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Nhạc sĩ ảnh hưởng</label><input type="text" id="m1-artist" placeholder="Tên nhạc sĩ..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200"></div>
                         </div>
-                    </div>
-
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xl">
-                        <div class="flex items-center justify-between"><h3 class="text-sm font-bold text-white">02. Câu chuyện & Lyrics</h3><span class="text-xs font-mono text-slate-500">02</span></div>
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Ý tưởng lyric</label><textarea id="m1-lyrics-idea" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm text-slate-200 resize-none">Những câu hát nhất định phải có trong bản nhạc...</textarea></div>
                     </div>
 
                     <div class="flex justify-end pt-2">
@@ -282,44 +256,50 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 4: BẢN NHẠC (MODULE 3) ================= -->
+        <!-- ================= VIEW 4: BẢN NHẠC (MODULE 3 - XUẤT LEAD SHEET CÓ NỐT NHẠC) ================= -->
         <section id="content-ban-nhac" class="tab-content hidden space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-6">
                     <div class="border-b border-slate-800 pb-4">
                         <span class="text-xs uppercase tracking-widest text-purple-400 font-bold">MUSE STUDIO / 03</span>
                         <h2 class="text-3xl font-black text-white mt-1">Bản nhạc.</h2>
-                        <p class="text-xs text-slate-400 mt-1">Quản lý file nhạc, prompt, lời bài hát và xuất Lead Sheet PDF in ấn.</p>
+                        <p class="text-xs text-slate-400 mt-1">Tạo Lead Sheet chuyên nghiệp có nốt nhạc trực quan cho nhạc công và lời ca cho ca sĩ.</p>
                     </div>
 
                     <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xl">
-                        <div class="flex items-center justify-between"><h3 class="text-sm font-bold text-white">01. Bản nhạc của bạn</h3><span class="text-xs font-mono text-slate-500">01</span></div>
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Link nhạc</label><input type="text" id="m3-link" placeholder="Dán link Suno..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200"></div>
+                        <div class="flex items-center justify-between"><h3 class="text-sm font-bold text-white">01. Thông tin bản nhạc</h3><span class="text-xs font-mono text-slate-500">01</span></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Tên bài hát</label><input type="text" id="m3-title" value="Bản Tình Ca Mùa Hè" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200"></div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Nhịp điệu / Tempo</label><input type="text" id="m3-tempo" value="C Major · 120 BPM" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200"></div>
+                        </div>
+                        <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Link nhạc (Suno)</label><input type="text" id="m3-link" placeholder="Dán link Suno..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200"></div>
+                    </div>
+
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xl">
+                        <div class="flex items-center justify-between"><h3 class="text-sm font-bold text-white">02. Ký âm nốt nhạc & Lyrics (Lead Sheet ABCjs)</h3><span class="text-xs font-mono text-slate-500">02</span></div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Upload nhạc</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-800 border-dashed rounded-2xl cursor-pointer bg-slate-950 hover:bg-slate-900 transition-all">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <p class="text-xs text-slate-400"><span class="font-semibold text-purple-400">Click chọn file</span> hoặc kéo thả (MP3, WAV)</p>
-                                </div>
-                                <input type="file" id="m3-file" class="hidden" accept=".mp3,.wav,.mp4" onchange="handleAudioUpload(event)">
-                            </label>
-                            <p id="m3-filename" class="text-xs text-emerald-400 mt-1.5 font-mono"></p>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Ký hiệu giai điệu (ABC Notation cho nốt nhạc)</label>
+                            <textarea id="m3-abc" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-mono text-emerald-400 resize-none">X:1
+T:Bản Tình Ca Mùa Hè
+M:4/4
+L:1/4
+K:C
+C E G c | B A G2 | F A c B | A G C2 ||</textarea>
+                            <p class="text-[11px] text-slate-500 mt-1">Hệ thống tự động biên dịch mã này thành bản nhạc có nốt chuẩn xác cho nhạc công.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Lyrics chi tiết (Cho ca sĩ)</label>
+                            <textarea id="m3-lyrics" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-mono text-slate-300 resize-none">[Verse 1]
+Một buổi chiều Hà Nội, cơn mưa nhẹ rơi...
+
+[Chorus - Hook]
+Những câu hát giữ mãi trong tim...</textarea>
                         </div>
                     </div>
 
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xl">
-                        <div class="flex items-center justify-between"><h3 class="text-sm font-bold text-white">02. Dấu ấn sáng tác & Lyrics</h3><span class="text-xs font-mono text-slate-500">02</span></div>
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Prompt tạo nhạc</label><textarea id="m3-prompt" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm text-slate-200 resize-none"></textarea></div>
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1.5">Lyrics kèm theo (Lead Sheet)</label><textarea id="m3-lyrics" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-mono text-slate-300 resize-none">[Verse 1]
-Một buổi chiều Hà Nội...
-
-[Chorus]
-Những câu hát giữ mãi...</textarea></div>
-                    </div>
-
                     <div class="flex justify-end pt-2">
-                        <button onclick="createMusicPackage()" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold text-sm shadow-xl shadow-purple-500/30 hover:scale-105 transition-all">
-                            Tạo file & Lead Sheet PDF →
+                        <button onclick="renderLeadSheet()" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold text-sm shadow-xl shadow-purple-500/30 hover:scale-105 transition-all">
+                            Render Lead Sheet & Bản nhạc PDF →
                         </button>
                     </div>
                 </div>
@@ -327,16 +307,16 @@ Những câu hát giữ mãi...</textarea></div>
                 <div class="space-y-6">
                     <div class="sticky top-28 bg-slate-900/95 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 backdrop-blur-xl">
                         <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                            <h3 class="text-sm font-bold text-white">MUSE COLLECTION</h3>
-                            <span class="text-xs text-purple-400 font-medium">Lead Sheet Suite</span>
+                            <h3 class="text-sm font-bold text-white">Xem trước Lead Sheet</h3>
+                            <span class="text-xs text-purple-400 font-medium">Sheet Music View</span>
                         </div>
-                        <div class="space-y-3 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs">
-                            <div class="flex justify-between py-1 border-b border-slate-900"><span class="text-slate-400">File nhạc</span><span id="summary-file" class="text-slate-500">Chưa chọn</span></div>
-                            <div class="flex justify-between py-1"><span class="text-slate-400">Bản nhạc & PDF</span><span class="text-purple-400">Sẵn sàng In</span></div>
+                        <div id="paper-notation" class="bg-white text-black p-4 rounded-2xl min-h-[180px] flex items-center justify-center overflow-x-auto">
+                            <span class="text-xs text-slate-400 font-sans">Bản nhạc có nốt sẽ hiển thị ở đây sau khi render...</span>
                         </div>
-                        <div id="download-package-area" class="space-y-3 hidden">
-                            <a id="download-package-btn" href="#" download="Muse_LeadSheet.html" class="w-full py-3.5 rounded-2xl bg-emerald-600 text-white font-bold text-xs text-center block shadow-lg">📥 Tải xuống Gói Bản Nhạc</a>
-                            <button onclick="window.print()" class="w-full py-3.5 rounded-2xl bg-purple-600 text-white font-bold text-xs shadow-lg">🖨️ In Lead Sheet / PDF</button>
+                        <div id="download-package-area" class="space-y-3">
+                            <button onclick="window.print()" class="w-full py-3.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg transition-all flex items-center justify-center space-x-2">
+                                <span>🖨️ In / Tải PDF Bản Nhạc (Full Nốt & Lyrics)</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -346,7 +326,7 @@ Những câu hát giữ mãi...</textarea></div>
     </main>
 
     <!-- FOOTER -->
-    <footer class="mt-auto border-t border-slate-800 bg-[#0B0F19] py-6 text-center text-xs text-slate-500">
+    <footer class="mt-auto border-t border-slate-800 bg-[#0B0F19] py-6 text-center text-xs text-slate-500 no-print">
         <p>Muse Music Studio Engine &copy; 2026. Developed for Boss Sơn Marki with Google R&D AI Standards. Cost: $0.00</p>
     </footer>
 
@@ -417,28 +397,28 @@ Những câu hát giữ mãi...</textarea></div>
             alert('Đã tạo kịch bản Google Veo đồng nhất nhân vật thành công!');
         }
 
-        let audioFileName = '';
-        function handleAudioUpload(event) {
-            const file = event.target.files[0];
-            if(file) {
-                audioFileName = file.name;
-                document.getElementById('m3-filename').innerText = 'File: ' + file.name;
-                document.getElementById('summary-file').innerText = file.name;
-                document.getElementById('summary-fileclassName = 'text-emerald-400';
-            }
+        // Tích hợp ABCjs để render nốt nhạc trực quan cho nhạc công
+        function renderLeadSheet() {
+            const abcString = document.getElementById('m3-abc').value;
+            const title = document.getElementById('m3-title').value;
+            const lyrics = document.getElementById('m3-lyrics').value;
+            
+            // Render nốt nhạc bằng ABCjs vào khung xem trước
+            ABCjs.renderAbc("paper-notation", abcString, {
+                responsive: "resize",
+                scale: 0.9,
+                add_classes: true
+            });
+            
+            alert('Đã render bản nhạc thành công! Bạn có thể bấm "In / Tải PDF Bản Nhạc" để xuất file in ấn cho nhạc công và ca sĩ.');
         }
 
-        function createMusicPackage() {
-            const link = document.getElementById('m3-link').value;
-            const prompt = document.getElementById('m3-prompt').value;
-            const lyrics = document.getElementById('m3-lyrics').value;
-            const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Lead Sheet</title><style>body{font-family:sans-serif;padding:40px;max-width:800px;margin:auto;}h1{color:#FF5722;}</style></head><body><h1>🎼 LEAD SHEET</h1><p><strong>Link:</strong> ${link}</p><p><strong>File:</strong> ${audioFileName}</p><h3>Prompt:</h3><pre>${prompt}</pre><h3>Lyrics:</h3><div style="white-space:pre-wrap;font-weight:500;">${lyrics}</div><br><button onclick="window.print()">In PDF</button></body></html>`;
-            const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-            const url = URL.createObjectURL(blob);
-            document.getElementById('download-package-btn').href = url;
-            document.getElementById('download-package-area').classList.remove('hidden');
-            alert('Đã tạo gói bản nhạc và Lead Sheet thành công!');
-        }
+        // Tự động render bản nhạc mẫu khi mở tab Bản Nhạc
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                ABCjs.renderAbc("paper-notation", document.getElementById('m3-abc').value, { responsive: "resize", scale: 0.9 });
+            } catch(e) {}
+        });
     </script>
 </body>
 </html>
