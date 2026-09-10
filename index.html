@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSE MUSIC STUDIO - Suno & Google Veo Engine</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    colors: {
+                        suno: {
+                            orange: '#FF5722',
+                            red: '#F43F5E',
+                            dark: '#0B0F19',
+                            card: '#131826',
+                            border: '#1F293D'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0B0F19; color: #F3F4F6; }
+        /* Exact Suno Header Blend */
+        .suno-header {
+            background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 50%, #FF8008 100%);
+        }
+        /* Hero Banner luxury vinyl art background inspired by MUSE-index-top-background.png */
+        .hero-banner-bg {
+            background: radial-gradient(circle at 75% 50%, rgba(147, 51, 234, 0.35) 0%, rgba(244, 63, 94, 0.25) 30%, #0B0F19 70%),
+                        linear-gradient(135deg, #131826 0%, #0B0F19 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-vinyl-glow {
+            position: absolute;
+            right: -50px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(255,100,100,0.4) 0%, rgba(147,51,234,0.2) 50%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(40px);
+            pointer-events: none;
+        }
+        .suno-gradient-text {
+            background: linear-gradient(135deg, #FF5722 0%, #FF8A65 50%, #F43F5E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0B0F19; }
+        ::-webkit-scrollbar-thumb { background: #1F293D; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+    <!-- HEADER: Sức mạnh thương hiệu Suno & Google Veo Studio -->
+    <header class="suno-header shadow-xl border-b border-orange-500/30 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('trang-chu')">
+                <div class="bg-white/15 p-2.5 rounded-xl backdrop-blur-md border border-white/20 shadow-inner flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-wider text-white drop-shadow-md">MUSE MUSIC STUDIO</h1>
+                    <p class="text-[11px] text-orange-100 font-medium tracking-wide">Suno AI Prompt Engine & Google Veo Cinematic Suite</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs in Header -->
+            <nav class="mt-3 sm:mt-0 flex items-center space-x-1 bg-black/20 p-1.5 rounded-full border border-white/10 shadow-inner">
+                <button onclick="switchTab('trang-chu')" id="tab-trang-chu" class="tab-btn px-4 py-2 rounded-full font-semibold text-xs transition-all text-white bg-white/20 shadow">Trang chủ</button>
+                <button onclick="switchTab('soan-nhac')" id="tab-soan-nhac" class="tab-btn px-4 py-2 rounded-full font-semibold text-xs transition-all text-orange-100 hover:text-white">Soạn nhạc</button>
+                <button onclick="switchTab('video-music')" id="tab-video-music" class="tab-btn px-4 py-2 rounded-full font-semibold text-xs transition-all text-orange-100 hover:text-white">Video Music</button>
+                <button onclick="switchTab('ban-nhac')" id="tab-ban-nhac" class="tab-btn px-4 py-2 rounded-full font-semibold text-xs transition-all text-orange-100 hover:text-white">Bản nhạc</button>
+            </nav>
+
+            <div class="hidden lg:flex items-center space-x-2 bg-black/20 px-3 py-1.5 rounded-full border border-white/10 text-xs text-orange-200">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>System Status: Optimal ($0.00)</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-8">
+
+        <!-- ================= VIEW 1: TRANG CHỦ ================= -->
+        <section id="content-trang-chu" class="tab-content space-y-10">
+            <!-- Hero Banner -->
+            <div class="hero-banner-bg rounded-3xl p-8 sm:p-14 border border-slate-800 shadow-2xl">
+                <div class="hero-vinyl-glow"></div>
+                <div class="relative z-10 max-w-2xl space-y-6">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-medium">
+                        <span>✨ YOUR FEELINGS. YOUR MUSIC.</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-tight text-white">
+                        Biến cảm xúc <br>thành <span class="suno-gradient-text">âm nhạc.</span>
+                    </h1>
+                    <p class="text-sm sm:text-base text-slate-400 leading-relaxed">
+                        Một ý tưởng nhỏ. Một giai điệu rất riêng.<br>Không gian viết prompt cho Suno, nơi câu chuyện của bạn tìm thấy thanh âm.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="switchTab('soan-nhac')" class="px-7 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold text-sm shadow-xl shadow-orange-500/30 hover:scale-105 transition-all flex items-center space-x-2">
+                            <span>Bắt đầu sáng tác</span>
+                            <span>→</span>
+                        </button>
+                        <button onclick="switchTab('video-music')" class="px-7 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700 transition-all flex items-center space-x-2">
+                            <span>Khám phá studio</span>
+                            <span>↗</span>
+                        </button>
+                    </div>
+                    <div class="pt-2 text-xs text-slate-500 flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>Dành cho những người có một câu chuyện muốn hát.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Studio Cards Grid -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-xs uppercase tracking-widest text-orange-400 font-bold">Không gian sáng tạo</span>
+                        <h2 class="text-2xl font-black tracking-tight text-white mt-1">Một studio. Vô vàn cảm hứng.</h2>
+                    </div>
+                    <span class="text-xs text-slate-500 hidden sm:inline">Từ ý tưởng đầu tiên đến bản nhạc của riêng bạn.</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="switchTab('soan-nhac')" class="group cursor-pointer bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-orange-500/50 rounded-3xl p-6 transition-all shadow-xl flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-lg border border-orange-500/20">🎵</div>
+                                <span class="text-xs font-mono text-slate-500">01 / CREATE</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white group-hover:text-orange-400 transition-colors">Soạn nhạc</h3>
+                                <p class="text-xs text-slate-400 mt-2 leading-relaxed">Chọn cảm xúc, chất nhạc và giọng hát. Định hình prompt mang dấu ấn của bạn.</p>
+                            </div>
+                        </div>
+                        <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-orange-400">
+                            <span>Viết nên giai điệu của bạn</span>
+                            <span>→</span>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('video-music')" class="group cursor-pointer bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-3xl p-6 transition-all shadow-xl flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-lg border border-cyan-500/20">🎬</div>
+                                <span class="text-xs font-mono text-slate-500">02 / VISUALIZE</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Video Music</h3>
+                                <p class="text-xs text-slate-400 mt-2 leading-relaxed">Kể câu chuyện âm nhạc bằng hình ảnh. Tạo prompt video theo từng phân cảnh Google Veo.</p>
+                            </div>
+                        </div>
+                        <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-cyan-400">
+                            <span>Cho âm nhạc một khung hình</span>
+                            <span>→</span>
+                        </div>
+                    </div>
+
+                    <div onclick="switchTab('ban-nhac')" class="group cursor-pointer bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-purple-500/50 rounded-3xl p-6 transition-all shadow-xl flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg border border-purple-500/20">🎼</div>
+                                <span class="text-xs font-mono text-slate-500">03 / COLLECT</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">Bản nhạc</h3>
+                                <p class="text-xs text-slate-400 mt-2 leading-relaxed">Gom file nhạc, prompt và lời bài hát. Tải về trọn bộ câu chuyện sáng tác.</p>
+                            </div>
+                        </div>
+                        <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-purple-400">
+                            <span>Lưu giữ bản nhạc của riêng bạn</span>
+                            <span>→</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Mood Selector Bar -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xl">✨</span>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Hôm nay, bạn đang cảm thấy gì?</h4>
+                        <p class="text-xs text-slate-400">Chọn một cảm xúc để bắt đầu câu chuyện âm nhạc.</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="selectMood('Lãng mạn')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-orange-500/20 hover:text-orange-400 text-xs font-medium border border-slate-700 transition-all">🤍 Lãng mạn</button>
+                    <button onclick="selectMood('Mộng mơ')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-orange-500/20 hover:text-orange-400 text-xs font-medium border border-slate-700 transition-all">✨ Mộng mơ</button>
+                    <button onclick="selectMood('Hoài niệm')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-orange-500/20 hover:text-orange-400 text-xs font-medium border border-slate-700 transition-all">☕ Hoài niệm</button>
+                    <button onclick="selectMood('Vui')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-orange-500/20 hover:text-orange-400 text-xs font-medium border border-slate-700 transition-all">🎵 Vui</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: SOẠN NHẠC ================= -->
+        <section id="content-soan-nhac" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+                <div class="border-b border-slate-800 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-orange-400 flex items-center gap-2">
+                        <span>🎵 Module Soạn Nhạc Suno AI Chuyên Sâu</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">Hệ thống tự động cấu trúc chuẩn Intro, Verse 1, Verse 2, Bridge, Chorus, Outro với độ dài 4-8 phút, cao trào và hook cuốn hút.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">1.1. Ý tưởng bản nhạc</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Chủ đề / Ý tưởng (Khung Typing)</label>
+                            <input type="text" id="m1-idea" placeholder="Ví dụ: Bản tình ca mùa hè lãng mạn, hồi ức tuổi trẻ bên bờ biển..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Cảm xúc</label>
+                                <select id="m1-mood" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-orange-500">
+                                    <option value="Lãng mạn">Lãng mạn</option>
+                                    <option value="Vui tươi, rộn ràng">Vui tươi, rộn ràng</option>
+                                    <option value="Buồn sâu lắng, hoài niệm">Buồn sâu lắng, hoài niệm</option>
+                                    <option value="Hào hùng, mạnh mẽ">Hào hùng, mạnh mẽ</option>
+                                    <option value="Bi tráng, sâu sắc">Bi tráng, sâu sắc</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Dòng nhạc</label>
+                                <select id="m1-genre" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-orange-500">
+                                    <option value="Pop Ballad hiện đại">Pop Ballad hiện đại</option>
+                                    <option value="Rap / Hip-hop Underground">Rap / Hip-hop Underground</option>
+                                    <option value="Rock Alternative">Rock Alternative</option>
+                                    <option value="Jazz Soul">Jazz Soul</option>
+                                    <option value="Epic Cinematic">Epic Cinematic</option>
+                                    <option value="Acapella Harmony">Acapella Harmony</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Nhạc cụ đề xuất</label>
+                                <input type="text" id="m1-instruments" placeholder="Ví dụ: Piano acoustic, guitar" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Nhạc sĩ ảnh hưởng</label>
+                                <input type="text" id="m1-artist" placeholder="Ví dụ: Hans Zimmer, Châu Đăng Khoa..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">1.2 & 1.3. Ý tưởng Lyric & Giọng hát</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Ý tưởng Lyric (Để trống hoặc nhập ý chính)</label>
+                            <textarea id="m1-lyrics-idea" rows="3" placeholder="Nhập ý tưởng lời bài hát hoặc đoạn thơ mẫu..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 resize-none"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Phong cách Lyric kết hợp</label>
+                                <select id="m1-lyric-style" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-orange-500">
+                                    <option value="Melody & Rap kết hợp">Melody & Rap kết hợp</option>
+                                    <option value="Melody thuần túy">Melody thuần túy</option>
+                                    <option value="Rap Flow nhanh, gắt">Rap Flow nhanh, gắt</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Giọng hát chính</label>
+                                <select id="m1-vocal-main" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-orange-500">
+                                    <option value="Nữ cao mỏng (Soprano)">Nữ cao mỏng</option>
+                                    <option value="Nam trầm ấm (Baritone/Bass)">Nam trầm ấm</option>
+                                    <option value="Song ca Nam & Nữ">Song ca Nam & Nữ</option>
+                                    <option value="Giọng thiếu nhi trong trẻo">Giọng thiếu nhi trong trẻo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Giọng bè & Hợp xướng</label>
+                            <select id="m1-vocal-harmony" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-orange-500">
+                                <option value="Hợp xướng giao hưởng hoành tráng">Hợp xướng giao hưởng hoành tráng</option>
+                                <option value="Đồng ca thiếu nhi hỗ trợ điệp khúc">Đồng ca thiếu nhi hỗ trợ điệp khúc</option>
+                                <option value="Hát bè nữ du dương">Hát bè nữ du dương</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button onclick="generateSunoPrompt()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl shadow-lg shadow-orange-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                        <span>⚡ PROCESS & TẠO SUNO PROMPT</span>
+                    </button>
+                    <span class="text-xs text-slate-400">Tự động cấu trúc đủ Intro, Verse 1, Verse 2, Bridge, Chorus, Outro (4-8 phút)</span>
+                </div>
+
+                <div class="mt-6 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-orange-400 uppercase tracking-wider">Kết quả Prompt Suno AI (Sẵn sàng Copy)</label>
+                        <button onclick="copyToClipboard('m1-output')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition-all flex items-center gap-1">
+                            📋 Sao chép Prompt
+                        </button>
+                    </div>
+                    <textarea id="m1-output" rows="6" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-emerald-400 focus:outline-none" placeholder="Nhấn nút Process phía trên để tạo prompt chi tiết..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 3: VIDEO MUSIC ================= -->
+        <section id="content-video-music" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                <div class="border-b border-slate-800 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-orange-400 flex items-center gap-2">
+                        <span>🎬 Module Video Music - Google Veo Cinematic Studio</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">Đảm bảo bối cảnh nhất quán xuyên suốt các batches, chuyển cảnh mượt mà, nhân vật không tự thoại, video hoàn toàn câm (silent cinematic).</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">2.1. Link video tham khảo (Khung typing)</label>
+                            <input type="text" id="m2-link" placeholder="Ví dụ: https://youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">2.2. Ý tưởng video / Cốt truyện sences</label>
+                            <textarea id="m2-idea" rows="3" placeholder="Ví dụ: Hành trình khám phá thành phố tương lai của nhân vật chính lúc hoàng hôn..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500 resize-none"></textarea>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">2.3. Phong cách hình ảnh</label>
+                                <input type="text" id="m2-style" placeholder="Ví dụ: Cinematic 4K, Unreal Engine 5" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">2.4. Màu sắc chủ đạo</label>
+                                <input type="text" id="m2-color" placeholder="Ví dụ: Neon cyberpunk, ấm áp cam hoàng hôn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">2.5. Số lượng sences (Batch số lượng)</label>
+                            <input type="number" id="m2-scenes" value="120" min="1" max="300" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button onclick="generateVeoPrompt()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl shadow-lg shadow-orange-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                        <span>⚡ PROCESS & TẠO GOOGLE VEO PROMPT</span>
+                    </button>
+                    <span class="text-xs text-slate-400">Đảm bảo nhân vật đồng nhất, camera mượt mà, hoàn toàn câm (silent)</span>
+                </div>
+
+                <div class="mt-6 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-orange-400 uppercase tracking-wider">Kết quả Prompt Google Veo (Sẵn sàng Copy)</label>
+                        <button onclick="copyToClipboard('m2-output')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition-all flex items-center gap-1">
+                            📋 Sao chép Prompt
+                        </button>
+                    </div>
+                    <textarea id="m2-output" rows="6" readonly class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-cyan-400 focus:outline-none" placeholder="Nhấn nút Process phía trên để tạo prompt video chi tiết..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 4: BẢN NHẠC ================= -->
+        <section id="content-ban-nhac" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                <div class="border-b border-slate-800 pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-orange-400 flex items-center gap-2">
+                        <span>🎼 Module Bản Nhạc - Quản lý & Xuất File Hoàn Chỉnh</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">Liên kết nguồn nhạc, upload file Audio/Video mẫu, quản lý prompt kèm lyrics và trích xuất file dự án.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">3.1. Link nhạc tham khảo (Khung typing)</label>
+                            <input type="text" id="m3-link" placeholder="Nhập đường dẫn link nhạc online..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">3.2. Upload nhạc (mp3, wav, mp4)</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-slate-800 border-dashed rounded-xl cursor-pointer bg-slate-950 hover:bg-slate-900 transition-all">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg class="w-8 h-8 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                        <p class="text-xs text-slate-400"><span class="font-semibold text-orange-400">Click chọn file</span> hoặc kéo thả vào đây</p>
+                                        <p class="text-[10px] text-slate-500 mt-1">MP3, WAV, MP4 (Tối đa 50MB)</p>
+                                    </div>
+                                    <input type="file" id="m3-file" class="hidden" accept=".mp3,.wav,.mp4" onchange="handleFileSelect(event)">
+                                </label>
+                            </div>
+                            <p id="file-chosen-name" class="text-xs text-emerald-400 mt-1 font-mono"></p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">3.3. Prompt tạo nhạc</label>
+                            <input type="text" id="m3-prompt" placeholder="Nhập prompt nhạc gốc..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500">
+                        </div>
+                    </div>
+                    <div class="space-y-4 flex flex-col">
+                        <div class="flex-grow flex flex-col">
+                            <label class="block text-xs font-medium text-slate-400 mb-1">3.4. Lyrics kèm theo (Chuẩn cấu trúc)</label>
+                            <textarea id="m3-lyrics" rows="9" placeholder="[Intro]&#10;[Verse 1]&#10;[Verse 2]&#10;[Chorus - Cao trào]&#10;[Bridge]&#10;[Outro]" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 focus:outline-none focus:border-orange-500 resize-none flex-grow"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button onclick="createMusicPackage()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold rounded-xl shadow-lg shadow-orange-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                        <span>🚀 TẠO BẢN NHẠC (CREATE FILE)</span>
+                    </button>
+                    <div id="download-area" class="hidden">
+                        <a id="download-btn" href="#" download="Muse_Music_Package.txt" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center space-x-2">
+                            <span>📥 DOWNLOAD BẢN NHẠC (.TXT/.ZIP)</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-500 mt-auto">
+        <p>Muse Music Studio Engine &copy; 2026. Developed for Boss Sơn Marki with Google R&D AI Standards. Cost: $0.00</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white/20', 'text-white', 'shadow');
+                el.classList.add('text-orange-100');
+            });
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-orange-100');
+                activeBtn.classList.add('bg-white/20', 'text-white', 'shadow');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function selectMood(mood) {
+            switchTab('soan-nhac');
+            const select = document.getElementById('m1-mood');
+            if(select) select.value = mood;
+        }
+
+        function copyToClipboard(elementId) {
+            const textarea = document.getElementById(elementId);
+            textarea.select();
+            document.execCommand('copy');
+            alert('Đã sao chép Prompt thành công vào clipboard!');
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('file-chosen-name').innerText = 'Đã chọn file: ' + file.name + ' (' + (file.size/1024/1024).toFixed(2) + ' MB)';
+            }
+        }
+
+        function generateSunoPrompt() {
+            const idea = document.getElementById('m1-idea').value || 'Bản nhạc cảm xúc chủ đề tự do';
+            const mood = document.getElementById('m1-mood').value;
+            const genre = document.getElementById('m1-genre').value;
+            const instruments = document.getElementById('m1-instruments').value || 'Piano, acoustic guitar, soft drums';
+            const artist = document.getElementById('m1-artist').value || 'Standard Modern Producer';
+            const lyricsIdea = document.getElementById('m1-lyrics-idea').value || 'Sáng tác lời bài hát theo cảm xúc sâu lắng';
+            const lyricStyle = document.getElementById('m1-lyric-style').value;
+            const vocalMain = document.getElementById('m1-vocal-main').value;
+            const vocalHarmony = document.getElementById('m1-vocal-harmony').value;
+
+            const sunoPrompt = `[Genre: ${genre}] [Mood: ${mood}] [Instruments: ${instruments}] [Influenced by: ${artist}]
+[Vocal Main: ${vocalMain}] [Vocal Harmony: ${vocalHarmony}] [Lyric Style: ${lyricStyle}]
+[Structure Requirements: 4-8 minutes length, dynamic progression, high emotional peak, catchy hook, strict sequence: Intro -> Verse 1 -> Verse 2 -> Pre-Chorus -> Chorus (Hook) -> Bridge -> Guitar/Synth Solo -> Final Chorus (High Peak) -> Outro]
+
+[Theme/Idea]: ${idea}
+
+[Lyrics & Arrangement Guide]:
+[Intro - 0:00 - 0:45] Ambient soundscapes, gentle melody introducing the theme.
+[Verse 1 - 0:45 - 1:45] Narrative storytelling, clear rhythm, emotional expression.
+[Verse 2 - 1:45 - 2:45] Deepening development, richer orchestration, building tension.
+[Chorus - 2:45 - 3:45] High-energy hook, soaring vocals, unforgettable melody peak.
+[Bridge - 3:45 - 4:30] Emotional turning point, shift in rhythm and chord progression.
+[Final Chorus - 4:30 - 5:30] Maximum climax, full vocal harmonies and symphonic backing.
+[Outro - 5:30 - 6:30] Gradual fade out, lingering emotional resonance.`;
+
+            document.getElementById('m1-output').value = sunoPrompt;
+        }
+
+        function generateVeoPrompt() {
+            const link = document.getElementById('m2-link').value || 'Reference Video Clip';
+            const idea = document.getElementById('m2-idea').value || 'Cinematic visual sequence';
+            const style = document.getElementById('m2-style').value || 'Cinematic 4K, photorealistic';
+            const color = document.getElementById('m2-color').value || 'Cinematic golden hour grading';
+            const scenes = document.getElementById('m2-scenes').value || 120;
+
+            let veoPrompt = `=== GOOGLE VEO CINEMATIC PROMPT BATCHES (Total Sences: ${scenes}) ===\n`;
+            veoPrompt += `Reference Source: ${link} | Visual Style: ${style} | Color Grading: ${color}\n`;
+            veoPrompt += `Constraints: Consistent character identity, smooth camera transitions, silent cinematic video, ZERO dialogue/talking.\n\n`;
+
+            for(let i = 1; i <= Math.min(scenes, 5); i++) {
+                veoPrompt += `[Batch Scene ${i}/${scenes}]: ${idea}, ${style}, ${color}, ultra-detailed, stable character face, smooth cinematic pan, silent scene --ar 16:9 --veo-v2\n`;
+            }
+            if(scenes > 5) {
+                veoPrompt += `... [Batches 6 to ${scenes} follow identical character & color consistency rules, silent cinematic style]`;
+            }
+
+            document.getElementById('m2-output').value = veoPrompt;
+        }
+
+        function createMusicPackage() {
+            const link = document.getElementById('m3-link').value;
+            const prompt = document.getElementById('m3-prompt').value;
+            const lyrics = document.getElementById('m3-lyrics').value;
+
+            const content = `=== MUSE MUSIC PRODUCTION PACKAGE ===\nLink: ${link}\nPrompt: ${prompt}\n\nLyrics Structure:\n${lyrics}`;
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const downloadBtn = document.getElementById('download-btn');
+            downloadBtn.href = url;
+            document.getElementById('download-area').classList.remove('hidden');
+            alert('Đã đóng gói dữ liệu bản nhạc thành công! Bạn có thể nhấn nút Download bên cạnh để tải file.');
+        }
+    </script>
+</body>
+</html>
